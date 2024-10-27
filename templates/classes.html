@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Group Classes - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Group Classes</h2>
+        <a href="{{ url_for('create_class') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Create Class
+        </a>
+    </div>
+
+    <!-- Upcoming Classes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Upcoming Classes</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for class in upcoming_classes %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h4 class="h6 mb-1">{{ class.title }}</h4>
+                        <p class="mb-1 text-muted">
+                            <i class="bi bi-calendar"></i> {{ class.start_time.strftime('%B %d, %Y %I:%M %p') }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-clock"></i> {{ class.duration_minutes }} minutes
+                        </p>
+                        <p class="mb-1">
+                            <span class="badge bg-primary">{{ class.skill.name }}</span>
+                            <span class="badge bg-secondary">
+                                {{ class.participants|length }}/{{ class.max_participants }} participants
+                            </span>
+                        </p>
+                    </div>
+                    <div class="ms-3">
+                        {% if current_user != class.creator and not class.participants|selectattr("user_id", "equalto", current_user.id)|list %}
+                        <a href="{{ url_for('join_class', class_id=class.id) }}" 
+                           class="btn btn-outline-primary btn-sm">Join Class</a>
+                        {% endif %}
+                        <a href="{{ url_for('class_detail', class_id=class.id) }}" 
+                           class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item">
+                <p class="text-muted mb-0">No upcoming classes scheduled.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- My Classes -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="h5 mb-0">My Classes</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for class in my_classes %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h4 class="h6 mb-1">
+                            {{ class.title }}
+                            {% if class.creator == current_user %}
+                            <span class="badge bg-info">Creator</span>
+                            {% endif %}
+                        </h4>
+                        <p class="mb-1 text-muted">
+                            <i class="bi bi-calendar"></i> {{ class.start_time.strftime('%B %d, %Y %I:%M %p') }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-clock"></i> {{ class.duration_minutes }} minutes
+                        </p>
+                        <p class="mb-1">
+                            <span class="badge bg-primary">{{ class.skill.name }}</span>
+                            <span class="badge bg-{{ 'success' if class.status == 'completed' 
+                                                    else 'warning' if class.status == 'scheduled'
+                                                    else 'info' }}">
+                                {{ class.status|title }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="ms-3">
+                        <a href="{{ url_for('class_detail', class_id=class.id) }}" 
+                           class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item">
+                <p class="text-muted mb-0">You haven't joined any classes yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

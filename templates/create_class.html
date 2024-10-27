@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Create Group Class - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Create a Group Class</h2>
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Class Title</label>
+                            {{ form.title(class="form-control", id="title") }}
+                            {% for error in form.title.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            {{ form.description(class="form-control", id="description", rows="4") }}
+                            {% for error in form.description.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="skill_id" class="form-label">Skill to Teach</label>
+                            {{ form.skill_id(class="form-control", id="skill_id") }}
+                            {% for error in form.skill_id.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="start_time" class="form-label">Start Time</label>
+                                {{ form.start_time(class="form-control", id="start_time", type="datetime-local") }}
+                                {% for error in form.start_time.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="duration_minutes" class="form-label">Duration (minutes)</label>
+                                {{ form.duration_minutes(class="form-control", id="duration_minutes", type="number") }}
+                                {% for error in form.duration_minutes.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="max_participants" class="form-label">Maximum Participants</label>
+                            {{ form.max_participants(class="form-control", id="max_participants", type="number") }}
+                            {% for error in form.max_participants.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Create Class</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

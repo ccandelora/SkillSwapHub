@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group_class.title }} - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="mb-3">{{ group_class.title }}</h2>
+                    <div class="mb-4">
+                        <span class="badge bg-primary">{{ group_class.skill.name }}</span>
+                        <span class="badge bg-{{ 'success' if group_class.status == 'completed' 
+                                            else 'warning' if group_class.status == 'scheduled'
+                                            else 'info' }}">
+                            {{ group_class.status|title }}
+                        </span>
+                    </div>
+                    
+                    <h3 class="h5 mb-3">Description</h3>
+                    <p class="mb-4">{{ group_class.description }}</p>
+                    
+                    <h3 class="h5 mb-3">Class Details</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-calendar"></i>
+                            {{ group_class.start_time.strftime('%B %d, %Y %I:%M %p') }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock"></i>
+                            {{ group_class.duration_minutes }} minutes
+                        </li>
+                        <li>
+                            <i class="bi bi-person"></i>
+                            Instructor: {{ group_class.creator.username }}
+                        </li>
+                    </ul>
+
+                    {% if group_class.start_time <= now %}
+                    <div class="mt-4">
+                        <a href="{{ url_for('video_chat', user_id=group_class.creator_id, skill_id=group_class.skill_id) }}" 
+                           class="btn btn-primary">
+                            <i class="bi bi-camera-video"></i>
+                            Join Class Session
+                        </a>
+                    </div>
+                    {% elif not is_participant and current_user != group_class.creator %}
+                    <div class="mt-4">
+                        <a href="{{ url_for('join_class', class_id=group_class.id) }}" 
+                           class="btn btn-primary">Join Class</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="h5 mb-0">Participants ({{ group_class.participants|length }}/{{ group_class.max_participants }})</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for participant in group_class.participants %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">{{ participant.user.username }}</h6>
+                                <small class="text-muted">
+                                    Joined {{ participant.joined_at.strftime('%b %d, %Y') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{{ 'success' if participant.attendance_status == 'attended'
+                                                else 'danger' if participant.attendance_status == 'no_show'
+                                                else 'secondary' }}">
+                                {{ participant.attendance_status|title }}
+                            </span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="list-group-item">
+                        <p class="text-muted mb-0">No participants yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -15,6 +15,11 @@ class User(UserMixin, db.Model):
     skills_learning = db.relationship('UserSkill', backref='learner',
                                     foreign_keys='UserSkill.learner_id')
     achievements = db.relationship('UserAchievement', backref='user')
+    # Add relationships for group classes and challenges
+    created_classes = db.relationship('GroupClass', backref='creator',
+                                    foreign_keys='GroupClass.creator_id')
+    created_challenges = db.relationship('Challenge', backref='creator',
+                                       foreign_keys='Challenge.creator_id')
 
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +35,6 @@ class UserSkill(db.Model):
     proficiency_level = db.Column(db.String(20))
     is_teaching = db.Column(db.Boolean, default=False)
     skill = db.relationship('Skill')
-    # Add progression tracking fields
     total_hours = db.Column(db.Float, default=0.0)
     last_session = db.Column(db.DateTime)
     sessions_completed = db.Column(db.Integer, default=0)
@@ -39,8 +43,8 @@ class Achievement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
     description = db.Column(db.Text)
-    badge_icon = db.Column(db.String(64))  # Bootstrap icon class name
-    requirement_type = db.Column(db.String(32))  # e.g., 'teaching_hours', 'sessions', 'skills'
+    badge_icon = db.Column(db.String(64))
+    requirement_type = db.Column(db.String(32))
     requirement_value = db.Column(db.Integer)
 
 class UserAchievement(db.Model):
@@ -68,7 +72,7 @@ class VideoSession(db.Model):
     skill_id = db.Column(db.Integer, db.ForeignKey('skill.id'), nullable=False)
     start_time = db.Column(db.DateTime, default=datetime.utcnow)
     end_time = db.Column(db.DateTime, nullable=True)
-    status = db.Column(db.String(20), default='pending')  # pending, active, completed
+    status = db.Column(db.String(20), default='pending')
     duration_minutes = db.Column(db.Integer, nullable=True)
 
 class TimeTransaction(db.Model):
@@ -78,3 +82,64 @@ class TimeTransaction(db.Model):
     skill_id = db.Column(db.Integer, db.ForeignKey('skill.id'), nullable=False)
     hours = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+# New models for group classes and challenges
+class GroupClass(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text)
+    skill_id = db.Column(db.Integer, db.ForeignKey('skill.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    max_participants = db.Column(db.Integer, default=10)
+    start_time = db.Column(db.DateTime, nullable=False)
+    duration_minutes = db.Column(db.Integer, default=60)
+    status = db.Column(db.String(20), default='scheduled')  # scheduled, active, completed
+    room_id = db.Column(db.String(64), unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    skill = db.relationship('Skill')
+    participants = db.relationship('GroupClassParticipant', backref='group_class')
+
+class GroupClassParticipant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    class_id = db.Column(db.Integer, db.ForeignKey('group_class.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+    attendance_status = db.Column(db.String(20), default='registered')  # registered, attended, no_show
+    
+    user = db.relationship('User')
+
+class Challenge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text)
+    skill_id = db.Column(db.Integer, db.ForeignKey('skill.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    goal_type = db.Column(db.String(20), nullable=False)  # hours, sessions, tasks
+    goal_value = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), default='upcoming')  # upcoming, active, completed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    skill = db.relationship('Skill')
+    participants = db.relationship('ChallengeParticipant', backref='challenge')
+
+class ChallengeParticipant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    challenge_id = db.Column(db.Integer, db.ForeignKey('challenge.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+    current_progress = db.Column(db.Float, default=0)
+    completed = db.Column(db.Boolean, default=False)
+    
+    user = db.relationship('User')
+
+class ChallengeUpdate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    participant_id = db.Column(db.Integer, db.ForeignKey('challenge_participant.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    progress_amount = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    participant = db.relationship('ChallengeParticipant')
