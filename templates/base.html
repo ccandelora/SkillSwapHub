@@ -6,6 +6,7 @@
     <meta name="description" content="Skill Swap - Exchange skills and learn from others">
     <title>{% block title %}Skill Swap{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
@@ -27,8 +28,20 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('profile', 
-                                                  username=current_user.username) }}">
+                                               username=current_user.username) }}">
                             Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" 
+                           href="{{ url_for('video_sessions') }}"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="bottom"
+                           title="View your scheduled and active video sessions">
+                            <i class="bi bi-camera-video"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ active_sessions_count if active_sessions_count else '' }}
+                            </span>
                         </a>
                     </li>
                     {% endif %}

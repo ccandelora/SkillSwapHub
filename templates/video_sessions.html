@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Video Sessions - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Video Sessions</h2>
+    
+    <!-- Help Card -->
+    <div class="alert alert-info mb-4" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-info-circle"></i> How to Start a Video Session</h4>
+        <p>You can start a video learning session in two ways:</p>
+        <ol>
+            <li>Visit a teacher's profile and click the "Start Video Session" button</li>
+            <li>Use the video call button in your chat conversation with a teacher</li>
+        </ol>
+        <hr>
+        <p class="mb-0">All sessions are automatically tracked and contribute to your time credits!</p>
+    </div>
+
+    <!-- Active Sessions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Active & Scheduled Sessions</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for session in active_sessions %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">
+                            {{ session.skill.name }} with 
+                            {% if session.teacher_id == current_user.id %}
+                            {{ User.query.get(session.learner_id).username }}
+                            {% else %}
+                            {{ User.query.get(session.teacher_id).username }}
+                            {% endif %}
+                        </h5>
+                        <p class="mb-1 text-muted">
+                            Started: {{ session.start_time.strftime('%B %d, %Y %I:%M %p') }}
+                        </p>
+                    </div>
+                    <div>
+                        {% if session.status == 'pending' %}
+                        <span class="badge bg-warning">Scheduled</span>
+                        {% else %}
+                        <span class="badge bg-success">Active</span>
+                        {% endif %}
+                        <a href="{{ url_for('video_chat', user_id=session.teacher_id if current_user.id != session.teacher_id else session.learner_id, skill_id=session.skill_id) }}" 
+                           class="btn btn-primary btn-sm ms-2">
+                            <i class="bi bi-camera-video-fill"></i>
+                            Join Session
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item">
+                <p class="text-muted mb-0">No active or scheduled sessions</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Completed Sessions -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Recent Completed Sessions</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for session in completed_sessions %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ session.skill.name }}</h5>
+                        <p class="mb-1 text-muted">
+                            With: {% if session.teacher_id == current_user.id %}
+                                 {{ User.query.get(session.learner_id).username }}
+                                 {% else %}
+                                 {{ User.query.get(session.teacher_id).username }}
+                                 {% endif %}
+                            <br>
+                            Date: {{ session.start_time.strftime('%B %d, %Y') }}
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-secondary">{{ session.duration_minutes }} min</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item">
+                <p class="text-muted mb-0">No completed sessions yet</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+})
+</script>
+{% endblock %}

@@ -9,6 +9,19 @@ from utils.gemini_matcher import analyze_skill_compatibility, get_skill_recommen
 import json
 import uuid
 
+def get_active_sessions_count():
+    if current_user.is_authenticated:
+        return VideoSession.query.filter(
+            ((VideoSession.teacher_id == current_user.id) | 
+             (VideoSession.learner_id == current_user.id)) &
+            (VideoSession.status.in_(['pending', 'active']))
+        ).count()
+    return 0
+
+@app.context_processor
+def inject_active_sessions():
+    return {'active_sessions_count': get_active_sessions_count()}
+
 @app.route('/')
 def index():
     featured_skills = Skill.query.limit(6).all()
@@ -155,6 +168,25 @@ def matches():
     
     matches.sort(key=lambda x: x['score'], reverse=True)
     return render_template('matches.html', matches=matches)
+
+@app.route('/video-sessions')
+@login_required
+def video_sessions():
+    active_sessions = VideoSession.query.filter(
+        ((VideoSession.teacher_id == current_user.id) | 
+         (VideoSession.learner_id == current_user.id)) &
+        (VideoSession.status != 'completed')
+    ).order_by(VideoSession.start_time.desc()).all()
+    
+    completed_sessions = VideoSession.query.filter(
+        ((VideoSession.teacher_id == current_user.id) | 
+         (VideoSession.learner_id == current_user.id)) &
+        (VideoSession.status == 'completed')
+    ).order_by(VideoSession.start_time.desc()).limit(5).all()
+    
+    return render_template('video_sessions.html',
+                         active_sessions=active_sessions,
+                         completed_sessions=completed_sessions)
 
 @app.route('/video/<int:user_id>/<int:skill_id>')
 @login_required
