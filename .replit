@@ -19,6 +19,10 @@ args = "Skill Swap Server"
 task = "workflow.run"
 args = "Migration"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Column Verification"
+
 [[workflows.workflow]]
 name = "Skill Swap Server"
 author = "agent"
@@ -41,6 +45,17 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python migrations/add_skill_tracking_columns.py"
+
+[[workflows.workflow]]
+name = "Column Verification"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python verify_columns.py"
 
 [deployment]
 run = ["sh", "-c", "python main.py"]
