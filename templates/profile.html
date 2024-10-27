@@ -18,7 +18,10 @@
                     {% endif %}
                     
                     {% if user == current_user %}
-                    <a href="#" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                        <a href="{{ url_for('add_skill') }}" class="btn btn-primary btn-sm">Add New Skill</a>
+                    </div>
                     {% else %}
                     <a href="{{ url_for('chat', user_id=user.id) }}" 
                        class="btn btn-primary btn-sm">Send Message</a>
@@ -51,7 +54,10 @@
                     <h3>Skills Teaching</h3>
                     <div class="mb-4">
                         {% for skill in user.skills_teaching %}
-                        <span class="skill-badge">{{ skill.skill.name }}</span>
+                        <div class="skill-badge d-inline-block me-2 mb-2">
+                            {{ skill.skill.name }}
+                            <span class="badge bg-secondary ms-1">{{ skill.proficiency_level }}</span>
+                        </div>
                         {% else %}
                         <p>No teaching skills listed yet.</p>
                         {% endfor %}
@@ -60,7 +66,10 @@
                     <h3>Skills Learning</h3>
                     <div>
                         {% for skill in user.skills_learning %}
-                        <span class="skill-badge">{{ skill.skill.name }}</span>
+                        <div class="skill-badge d-inline-block me-2 mb-2">
+                            {{ skill.skill.name }}
+                            <span class="badge bg-secondary ms-1">{{ skill.proficiency_level }}</span>
+                        </div>
                         {% else %}
                         <p>No learning skills listed yet.</p>
                         {% endfor %}

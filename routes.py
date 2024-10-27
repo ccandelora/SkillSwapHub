@@ -47,6 +47,52 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+@app.route('/add_skill', methods=['GET', 'POST'])
+@login_required
+def add_skill():
+    form = SkillForm()
+    existing_skills = Skill.query.all()
+    
+    if form.validate_on_submit():
+        # Check if skill already exists
+        skill = Skill.query.filter_by(name=form.skill_name.data).first()
+        if not skill:
+            # Create new skill if it doesn't exist
+            skill = Skill(name=form.skill_name.data, description=form.description.data)
+            db.session.add(skill)
+            db.session.flush()  # Get the skill ID before committing
+        
+        # Check if user already has this skill in the same teaching/learning mode
+        existing_user_skill = UserSkill.query.filter_by(
+            skill_id=skill.id,
+            teacher_id=current_user.id if form.is_teaching.data else None,
+            learner_id=current_user.id if not form.is_teaching.data else None
+        ).first()
+        
+        if existing_user_skill:
+            flash('You already have this skill listed!')
+        else:
+            # Add the skill to user's profile
+            user_skill = UserSkill(
+                skill_id=skill.id,
+                teacher_id=current_user.id if form.is_teaching.data else None,
+                learner_id=current_user.id if not form.is_teaching.data else None,
+                proficiency_level=form.proficiency_level.data,
+                is_teaching=form.is_teaching.data
+            )
+            db.session.add(user_skill)
+            
+            try:
+                db.session.commit()
+                flash('Skill added successfully!')
+                return redirect(url_for('profile', username=current_user.username))
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while adding the skill.')
+                print(f"Error: {e}")
+                
+    return render_template('add_skill.html', form=form, existing_skills=existing_skills)
+
 @app.route('/profile/<username>')
 @login_required
 def profile(username):

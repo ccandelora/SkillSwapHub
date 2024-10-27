@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Add Skill - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Add a New Skill</h2>
+                    <form method="POST" action="{{ url_for('add_skill') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label for="skill_name" class="form-label">Skill Name</label>
+                            {{ form.skill_name(class="form-control", id="skill_name", list="existing-skills") }}
+                            <datalist id="existing-skills">
+                                {% for skill in existing_skills %}
+                                <option value="{{ skill.name }}">
+                                {% endfor %}
+                            </datalist>
+                            {% for error in form.skill_name.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="proficiency_level" class="form-label">Proficiency Level</label>
+                            {{ form.proficiency_level(class="form-control", id="proficiency_level") }}
+                            {% for error in form.proficiency_level.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_teaching(class="form-check-input", id="is_teaching") }}
+                                <label class="form-check-label" for="is_teaching">
+                                    I want to teach this skill
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description (Optional)</label>
+                            {{ form.description(class="form-control", id="description", rows="3") }}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Add Skill</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
