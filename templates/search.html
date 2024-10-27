@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Search Skills - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <form method="GET" action="{{ url_for('search') }}" class="d-flex gap-2">
+                <input type="search" name="q" class="form-control" 
+                       placeholder="Search for skills..." 
+                       value="{{ query }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+
+    {% if skills %}
+    <div class="row g-4">
+        {% for skill in skills %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ skill.name }}</h5>
+                    {% if skill.description %}
+                    <p class="card-text">{{ skill.description }}</p>
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if skill.category %}
+                        <span class="badge bg-secondary">{{ skill.category }}</span>
+                        {% endif %}
+                        <div class="btn-group">
+                            <a href="{{ url_for('add_skill') }}?skill={{ skill.name }}" 
+                               class="btn btn-sm btn-outline-primary">Learn This</a>
+                            <a href="{{ url_for('add_skill') }}?skill={{ skill.name }}&teach=true" 
+                               class="btn btn-sm btn-primary">Teach This</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <div class="alert alert-info">
+        No skills found matching "{{ query }}". 
+        <a href="{{ url_for('add_skill') }}">Add it as a new skill?</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

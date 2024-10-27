@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
                                     foreign_keys='UserSkill.teacher_id')
     skills_learning = db.relationship('UserSkill', backref='learner',
                                     foreign_keys='UserSkill.learner_id')
+    achievements = db.relationship('UserAchievement', backref='user')
 
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,6 +30,25 @@ class UserSkill(db.Model):
     proficiency_level = db.Column(db.String(20))
     is_teaching = db.Column(db.Boolean, default=False)
     skill = db.relationship('Skill')
+    # Add progression tracking fields
+    total_hours = db.Column(db.Float, default=0.0)
+    last_session = db.Column(db.DateTime)
+    sessions_completed = db.Column(db.Integer, default=0)
+
+class Achievement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    badge_icon = db.Column(db.String(64))  # Bootstrap icon class name
+    requirement_type = db.Column(db.String(32))  # e.g., 'teaching_hours', 'sessions', 'skills'
+    requirement_value = db.Column(db.Integer)
+
+class UserAchievement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    achievement_id = db.Column(db.Integer, db.ForeignKey('achievement.id'), nullable=False)
+    earned_at = db.Column(db.DateTime, default=datetime.utcnow)
+    achievement = db.relationship('Achievement')
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)

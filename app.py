@@ -34,3 +34,7 @@ with app.app_context():
     import models
     import routes
     db.create_all()
+    
+    # Initialize achievements
+    from utils.achievements import initialize_achievements
+    initialize_achievements()
