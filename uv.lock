@@ -715,6 +715,7 @@ dependencies = [
     { name = "psycopg2-binary" },
     { name = "simple-websocket" },
     { name = "sqlalchemy" },
+    { name = "stripe" },
 ]
 
 [package.metadata]
@@ -729,6 +730,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "simple-websocket", specifier = ">=1.1.0" },
     { name = "sqlalchemy" },
+    { name = "stripe", specifier = ">=11.1.1" },
 ]
 
 [[package]]
@@ -805,6 +807,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/95/81babb6089938680dfe2cd3f88cd3fd39cccd1543b7cb603b21ad881bff1/SQLAlchemy-2.0.36-cp313-cp313-win32.whl", hash = "sha256:0572f4bd6f94752167adfd7c1bed84f4b240ee6203a95e05d1e208d488d0d436", size = 2060439 },
     { url = "https://files.pythonhosted.org/packages/c1/ce/5f7428df55660d6879d0522adc73a3364970b5ef33ec17fa125c5dbcac1d/SQLAlchemy-2.0.36-cp313-cp313-win_amd64.whl", hash = "sha256:8c78ac40bde930c60e0f78b3cd184c580f89456dd87fc08f9e3ee3ce8765ce88", size = 2084574 },
     { url = "https://files.pythonhosted.org/packages/b8/49/21633706dd6feb14cd3f7935fc00b60870ea057686035e1a99ae6d9d9d53/SQLAlchemy-2.0.36-py3-none-any.whl", hash = "sha256:fddbe92b4760c6f5d48162aef14824add991aeda8ddadb3c31d56eb15ca69f8e", size = 1883787 },
+]
+
+[[package]]
+name = "stripe"
+version = "11.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3f/82/0732dd3c352c047cdde76aed389c0b7386faa6ffad2b2d952729b593a6c2/stripe-11.1.1.tar.gz", hash = "sha256:0bbdfe54a09728fc54db6bb099b2f440ffc111d07d9674b0f04bfd0d3c1cbdcf", size = 1340542 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/d8/7ce4ed9c5ef8edd51a2c44705d3cbeaace3974767838476e1f4ff3c53900/stripe-11.1.1-py2.py3-none-any.whl", hash = "sha256:e79e02238d0ec7c89a64986af941dcae41e4857489b7cc83497acce9def356e5", size = 1591162 },
 ]
 
 [[package]]

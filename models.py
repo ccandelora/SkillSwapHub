@@ -11,17 +11,31 @@ class User(UserMixin, db.Model):
     time_credits = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     location = db.Column(db.String(128))  # Added for meetup functionality
+    # New subscription fields
+    subscription_type = db.Column(db.String(20), default='free')  # free, basic, premium
+    subscription_end_date = db.Column(db.DateTime)
+    
     skills_teaching = db.relationship('UserSkill', backref='teacher',
-                                    foreign_keys='UserSkill.teacher_id')
+                                   foreign_keys='UserSkill.teacher_id')
     skills_learning = db.relationship('UserSkill', backref='learner',
-                                    foreign_keys='UserSkill.learner_id')
+                                   foreign_keys='UserSkill.learner_id')
     achievements = db.relationship('UserAchievement', backref='user')
     created_classes = db.relationship('GroupClass', backref='creator',
-                                    foreign_keys='GroupClass.creator_id')
+                                   foreign_keys='GroupClass.creator_id')
     created_challenges = db.relationship('Challenge', backref='creator',
-                                       foreign_keys='Challenge.creator_id')
+                                      foreign_keys='Challenge.creator_id')
     created_meetups = db.relationship('Meetup', backref='creator',
-                                    foreign_keys='Meetup.creator_id')
+                                   foreign_keys='Meetup.creator_id')
+
+class SubscriptionPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), unique=True, nullable=False)  # free, basic, premium
+    price = db.Column(db.Float, nullable=False)
+    duration_months = db.Column(db.Integer, nullable=False)
+    features = db.Column(db.JSON)  # Store features as JSON
+    stripe_price_id = db.Column(db.String(100), unique=True)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -145,7 +159,6 @@ class ChallengeUpdate(db.Model):
     
     participant = db.relationship('ChallengeParticipant')
 
-# New models for local meetups
 class Meetup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)

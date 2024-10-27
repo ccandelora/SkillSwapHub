@@ -17,5 +17,9 @@ def load_user(id):
     from models import User
     return User.query.get(int(id))
 
+# Register blueprints
+from routes.subscription import bp as subscription_bp
+app.register_blueprint(subscription_bp, url_prefix='/subscription')
+
 # Import routes after app initialization to avoid circular imports
 from routes import *

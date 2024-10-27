@@ -23,6 +23,10 @@ args = "Migration"
 task = "workflow.run"
 args = "Column Verification"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Subscription Migration"
+
 [[workflows.workflow]]
 name = "Skill Swap Server"
 author = "agent"
@@ -56,6 +60,17 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python verify_columns.py"
+
+[[workflows.workflow]]
+name = "Subscription Migration"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python migrations/add_subscription_columns.py"
 
 [deployment]
 run = ["sh", "-c", "python main.py"]
