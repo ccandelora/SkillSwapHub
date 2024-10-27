@@ -714,6 +714,7 @@ dependencies = [
     { name = "google-generativeai" },
     { name = "psycopg2-binary" },
     { name = "simple-websocket" },
+    { name = "sqlalchemy" },
 ]
 
 [package.metadata]
@@ -727,6 +728,7 @@ requires-dist = [
     { name = "google-generativeai", specifier = ">=0.8.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "simple-websocket", specifier = ">=1.1.0" },
+    { name = "sqlalchemy" },
 ]
 
 [[package]]
