@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Create Meetup - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Create a Local Meetup</h2>
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Meetup Title</label>
+                            {{ form.title(class="form-control", id="title") }}
+                            {% for error in form.title.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            {{ form.description(class="form-control", id="description", rows="4") }}
+                            {% for error in form.description.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="skill_id" class="form-label">Skill to Share</label>
+                            {{ form.skill_id(class="form-control", id="skill_id") }}
+                            {% for error in form.skill_id.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="location" class="form-label">Location</label>
+                                {{ form.location(class="form-control", id="location") }}
+                                {% for error in form.location.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="skill_level" class="form-label">Skill Level</label>
+                                {{ form.skill_level(class="form-control", id="skill_level") }}
+                                {% for error in form.skill_level.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="venue_details" class="form-label">Venue Details (Optional)</label>
+                            {{ form.venue_details(class="form-control", id="venue_details", rows="2") }}
+                            {% for error in form.venue_details.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="date_time" class="form-label">Date and Time</label>
+                                {{ form.date_time(class="form-control", id="date_time", type="datetime-local") }}
+                                {% for error in form.date_time.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="duration_minutes" class="form-label">Duration (minutes)</label>
+                                {{ form.duration_minutes(class="form-control", id="duration_minutes", type="number") }}
+                                {% for error in form.duration_minutes.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="max_participants" class="form-label">Maximum Participants</label>
+                            {{ form.max_participants(class="form-control", id="max_participants", type="number") }}
+                            {% for error in form.max_participants.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_recurring(class="form-check-input", id="is_recurring") }}
+                                <label class="form-check-label" for="is_recurring">
+                                    Recurring Meetup
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4" id="recurrenceOptions" style="display: none;">
+                            <label for="recurrence_pattern" class="form-label">Recurrence Pattern</label>
+                            {{ form.recurrence_pattern(class="form-control", id="recurrence_pattern") }}
+                            {% for error in form.recurrence_pattern.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Create Meetup</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const isRecurringCheckbox = document.getElementById('is_recurring');
+    const recurrenceOptions = document.getElementById('recurrenceOptions');
+    
+    function toggleRecurrenceOptions() {
+        recurrenceOptions.style.display = isRecurringCheckbox.checked ? 'block' : 'none';
+    }
+    
+    isRecurringCheckbox.addEventListener('change', toggleRecurrenceOptions);
+    toggleRecurrenceOptions();
+});
+</script>
+{% endblock %}

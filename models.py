@@ -10,16 +10,18 @@ class User(UserMixin, db.Model):
     bio = db.Column(db.Text)
     time_credits = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    location = db.Column(db.String(128))  # Added for meetup functionality
     skills_teaching = db.relationship('UserSkill', backref='teacher',
                                     foreign_keys='UserSkill.teacher_id')
     skills_learning = db.relationship('UserSkill', backref='learner',
                                     foreign_keys='UserSkill.learner_id')
     achievements = db.relationship('UserAchievement', backref='user')
-    # Add relationships for group classes and challenges
     created_classes = db.relationship('GroupClass', backref='creator',
                                     foreign_keys='GroupClass.creator_id')
     created_challenges = db.relationship('Challenge', backref='creator',
                                        foreign_keys='Challenge.creator_id')
+    created_meetups = db.relationship('Meetup', backref='creator',
+                                    foreign_keys='Meetup.creator_id')
 
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -83,7 +85,6 @@ class TimeTransaction(db.Model):
     hours = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# New models for group classes and challenges
 class GroupClass(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)
@@ -93,7 +94,7 @@ class GroupClass(db.Model):
     max_participants = db.Column(db.Integer, default=10)
     start_time = db.Column(db.DateTime, nullable=False)
     duration_minutes = db.Column(db.Integer, default=60)
-    status = db.Column(db.String(20), default='scheduled')  # scheduled, active, completed
+    status = db.Column(db.String(20), default='scheduled')
     room_id = db.Column(db.String(64), unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -105,7 +106,7 @@ class GroupClassParticipant(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('group_class.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
-    attendance_status = db.Column(db.String(20), default='registered')  # registered, attended, no_show
+    attendance_status = db.Column(db.String(20), default='registered')
     
     user = db.relationship('User')
 
@@ -117,9 +118,9 @@ class Challenge(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
-    goal_type = db.Column(db.String(20), nullable=False)  # hours, sessions, tasks
+    goal_type = db.Column(db.String(20), nullable=False)
     goal_value = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(20), default='upcoming')  # upcoming, active, completed
+    status = db.Column(db.String(20), default='upcoming')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     skill = db.relationship('Skill')
@@ -143,3 +144,35 @@ class ChallengeUpdate(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     participant = db.relationship('ChallengeParticipant')
+
+# New models for local meetups
+class Meetup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text)
+    skill_id = db.Column(db.Integer, db.ForeignKey('skill.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    location = db.Column(db.String(256), nullable=False)
+    venue_details = db.Column(db.Text)
+    max_participants = db.Column(db.Integer, default=10)
+    date_time = db.Column(db.DateTime, nullable=False)
+    duration_minutes = db.Column(db.Integer, default=120)
+    status = db.Column(db.String(20), default='upcoming')  # upcoming, ongoing, completed, cancelled
+    skill_level = db.Column(db.String(20), default='all')  # beginner, intermediate, advanced, all
+    is_recurring = db.Column(db.Boolean, default=False)
+    recurrence_pattern = db.Column(db.String(64))  # weekly, biweekly, monthly
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    skill = db.relationship('Skill')
+    participants = db.relationship('MeetupParticipant', backref='meetup')
+
+class MeetupParticipant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    meetup_id = db.Column(db.Integer, db.ForeignKey('meetup.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    role = db.Column(db.String(20), default='attendee')  # attendee, co-host
+    rsvp_status = db.Column(db.String(20), default='going')  # going, maybe, not_going
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+    attended = db.Column(db.Boolean, default=False)
+    
+    user = db.relationship('User')

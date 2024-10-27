@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Local Meetups - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Local Meetups</h2>
+        <a href="{{ url_for('create_meetup') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Create Meetup
+        </a>
+    </div>
+
+    <!-- Location Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" 
+                           value="{{ request.args.get('location', '') }}"
+                           placeholder="Enter city or area">
+                </div>
+                <div class="col-md-3">
+                    <label for="skill" class="form-label">Skill</label>
+                    <select class="form-select" id="skill" name="skill">
+                        <option value="">Any Skill</option>
+                        {% for skill in skills %}
+                        <option value="{{ skill.id }}" 
+                                {% if request.args.get('skill')|int == skill.id %}selected{% endif %}>
+                            {{ skill.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date" class="form-label">Date Range</label>
+                    <select class="form-select" id="date" name="date">
+                        <option value="upcoming" {% if request.args.get('date') == 'upcoming' %}selected{% endif %}>
+                            Upcoming
+                        </option>
+                        <option value="week" {% if request.args.get('date') == 'week' %}selected{% endif %}>
+                            This Week
+                        </option>
+                        <option value="month" {% if request.args.get('date') == 'month' %}selected{% endif %}>
+                            This Month
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upcoming Meetups -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Upcoming Meetups</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for meetup in upcoming_meetups %}
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="h6 mb-1">{{ meetup.title }}</h4>
+                        <p class="mb-1 text-muted">
+                            <i class="bi bi-geo-alt"></i> {{ meetup.location }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-calendar"></i> 
+                            {{ meetup.date_time.strftime('%B %d, %Y %I:%M %p') }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-clock"></i> {{ meetup.duration_minutes }} minutes
+                        </p>
+                        <p class="mb-1">
+                            <span class="badge bg-primary">{{ meetup.skill.name }}</span>
+                            <span class="badge bg-info">{{ meetup.skill_level|title }}</span>
+                            {% if meetup.is_recurring %}
+                            <span class="badge bg-secondary">{{ meetup.recurrence_pattern|title }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                        <span class="text-muted me-3">
+                            {{ meetup.participants|length }}/{{ meetup.max_participants }} attending
+                        </span>
+                        {% if current_user != meetup.creator and not meetup.participants|selectattr("user_id", "equalto", current_user.id)|list %}
+                        <a href="{{ url_for('join_meetup', meetup_id=meetup.id) }}" 
+                           class="btn btn-outline-primary btn-sm">RSVP</a>
+                        {% endif %}
+                        <a href="{{ url_for('meetup_detail', meetup_id=meetup.id) }}" 
+                           class="btn btn-primary btn-sm">Details</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item">
+                <p class="text-muted mb-0">No upcoming meetups in your area.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- My Meetups -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="h5 mb-0">My Meetups</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for meetup in my_meetups %}
+            <div class="list-group-item">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="h6 mb-1">
+                            {{ meetup.title }}
+                            {% if meetup.creator == current_user %}
+                            <span class="badge bg-info">Organizer</span>
+                            {% endif %}
+                        </h4>
+                        <p class="mb-1 text-muted">
+                            <i class="bi bi-geo-alt"></i> {{ meetup.location }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-calendar"></i> 
+                            {{ meetup.date_time.strftime('%B %d, %Y %I:%M %p') }}
+                        </p>
+                        <p class="mb-1">
+                            <span class="badge bg-primary">{{ meetup.skill.name }}</span>
+                            <span class="badge bg-{{ 'success' if meetup.status == 'completed' 
+                                                else 'warning' if meetup.status == 'upcoming'
+                                                else 'info' }}">
+                                {{ meetup.status|title }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                        <a href="{{ url_for('meetup_detail', meetup_id=meetup.id) }}" 
+                           class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item">
+                <p class="text-muted mb-0">You haven't joined any meetups yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, BooleanField, IntegerField, DateTimeLocalField, DateField
+from wtforms import (StringField, PasswordField, TextAreaField, SelectField, 
+                    BooleanField, IntegerField, DateTimeLocalField, DateField)
 from wtforms.validators import DataRequired, Email, Length, EqualTo, NumberRange, ValidationError
 from datetime import datetime
 
@@ -27,7 +28,6 @@ class SkillForm(FlaskForm):
 class MessageForm(FlaskForm):
     content = TextAreaField('Message', validators=[DataRequired()])
 
-# New forms for group classes and challenges
 class GroupClassForm(FlaskForm):
     title = StringField('Class Title', validators=[DataRequired(), Length(max=128)])
     description = TextAreaField('Description', validators=[DataRequired()])
@@ -69,3 +69,37 @@ class ChallengeForm(FlaskForm):
 class ChallengeUpdateForm(FlaskForm):
     content = TextAreaField('Update Description', validators=[DataRequired()])
     progress_amount = IntegerField('Progress Amount', validators=[NumberRange(min=0)])
+
+# New forms for meetups
+class MeetupForm(FlaskForm):
+    title = StringField('Meetup Title', validators=[DataRequired(), Length(max=128)])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    skill_id = SelectField('Skill', coerce=int, validators=[DataRequired()])
+    location = StringField('Location', validators=[DataRequired(), Length(max=256)])
+    venue_details = TextAreaField('Venue Details (Optional)')
+    max_participants = IntegerField('Maximum Participants',
+                                  validators=[DataRequired(), NumberRange(min=2, max=100)],
+                                  default=10)
+    date_time = DateTimeLocalField('Date and Time',
+                                 format='%Y-%m-%dT%H:%M',
+                                 validators=[DataRequired()])
+    duration_minutes = IntegerField('Duration (minutes)',
+                                  validators=[DataRequired(), NumberRange(min=30, max=480)],
+                                  default=120)
+    skill_level = SelectField('Skill Level Required',
+                            choices=[('all', 'All Levels'),
+                                   ('beginner', 'Beginner'),
+                                   ('intermediate', 'Intermediate'),
+                                   ('advanced', 'Advanced')],
+                            default='all')
+    is_recurring = BooleanField('Recurring Meetup')
+    recurrence_pattern = SelectField('Recurrence Pattern',
+                                   choices=[('', 'One-time'),
+                                          ('weekly', 'Weekly'),
+                                          ('biweekly', 'Bi-weekly'),
+                                          ('monthly', 'Monthly')],
+                                   default='')
+
+    def validate_date_time(self, field):
+        if field.data < datetime.now():
+            raise ValidationError('Meetup time must be in the future')
