@@ -3,37 +3,81 @@
 {% block title %}Search Skills - Skill Swap{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-md-8 mx-auto">
-            <form method="GET" action="{{ url_for('search') }}" class="d-flex gap-2">
-                <input type="search" name="q" class="form-control" 
-                       placeholder="Search for skills..." 
-                       value="{{ query }}">
-                <button type="submit" class="btn btn-primary">Search</button>
+<div class="container py-4">
+    <h2 class="mb-4">Search Skills</h2>
+    
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="skill" class="form-label">Skill</label>
+                    <input type="text" class="form-control" id="skill" name="skill" 
+                           value="{{ request.args.get('skill', '') }}" 
+                           placeholder="e.g., Python, Guitar, Cooking">
+                </div>
+                <div class="col-md-3">
+                    <label for="proficiency" class="form-label">Proficiency Level</label>
+                    <select class="form-select" id="proficiency" name="proficiency">
+                        <option value="">Any Level</option>
+                        <option value="beginner" {% if request.args.get('proficiency') == 'beginner' %}selected{% endif %}>
+                            Beginner
+                        </option>
+                        <option value="intermediate" {% if request.args.get('proficiency') == 'intermediate' %}selected{% endif %}>
+                            Intermediate
+                        </option>
+                        <option value="advanced" {% if request.args.get('proficiency') == 'advanced' %}selected{% endif %}>
+                            Advanced
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="teaching" class="form-label">Looking For</label>
+                    <select class="form-select" id="teaching" name="teaching">
+                        <option value="teachers" {% if request.args.get('teaching') == 'teachers' %}selected{% endif %}>
+                            Teachers
+                        </option>
+                        <option value="learners" {% if request.args.get('teaching') == 'learners' %}selected{% endif %}>
+                            Learners
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
             </form>
         </div>
     </div>
 
+    <!-- Search Results -->
     {% if skills %}
     <div class="row g-4">
-        {% for skill in skills %}
-        <div class="col-md-6 col-lg-4">
+        {% for user_skill in skills %}
+        <div class="col-md-6">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">{{ skill.name }}</h5>
-                    {% if skill.description %}
-                    <p class="card-text">{{ skill.description }}</p>
-                    {% endif %}
-                    <div class="d-flex justify-content-between align-items-center">
-                        {% if skill.category %}
-                        <span class="badge bg-secondary">{{ skill.category }}</span>
-                        {% endif %}
-                        <div class="btn-group">
-                            <a href="{{ url_for('add_skill') }}?skill={{ skill.name }}" 
-                               class="btn btn-sm btn-outline-primary">Learn This</a>
-                            <a href="{{ url_for('add_skill') }}?skill={{ skill.name }}&teach=true" 
-                               class="btn btn-sm btn-primary">Teach This</a>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title mb-1">{{ user_skill.skill.name }}</h5>
+                            <p class="text-muted mb-2">
+                                {% if user_skill.is_teaching %}Teaching{% else %}Learning{% endif %} • 
+                                {{ user_skill.proficiency_level|title }}
+                            </p>
+                        </div>
+                        <a href="{{ url_for('profile', username=user_skill.teacher.username if user_skill.is_teaching else user_skill.learner.username) }}" 
+                           class="btn btn-outline-primary btn-sm">View Profile</a>
+                    </div>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="flex-grow-1">
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ (user_skill.total_hours / (50 if user_skill.is_teaching else 20) * 100)|round }}%">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {{ user_skill.total_hours|round(1) }} hours • 
+                                {{ user_skill.sessions_completed }} sessions
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -41,10 +85,34 @@
         </div>
         {% endfor %}
     </div>
-    {% elif query %}
+    {% elif request.args %}
     <div class="alert alert-info">
-        No skills found matching "{{ query }}". 
-        <a href="{{ url_for('add_skill') }}">Add it as a new skill?</a>
+        No results found for your search criteria. Try adjusting your filters.
+    </div>
+    {% endif %}
+
+    <!-- Popular Skills -->
+    {% if popular_skills %}
+    <div class="mt-5">
+        <h3 class="h4 mb-4">Popular Skills</h3>
+        <div class="row g-4">
+            {% for skill in popular_skills %}
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ skill.name }}</h5>
+                        <p class="card-text text-muted">
+                            {{ skill.teacher_count }} teachers • 
+                            {{ skill.learner_count }} learners
+                        </p>
+                        <a href="?skill={{ skill.name }}" class="btn btn-outline-primary btn-sm">
+                            Find {{ 'Teachers' if request.args.get('teaching') != 'learners' else 'Learners' }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 </div>
