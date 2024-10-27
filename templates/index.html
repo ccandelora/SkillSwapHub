@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Skill Swap - Exchange Skills, Build Community{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Learn & Teach in Our Skill Exchange Community</h1>
+        <p class="lead mb-4">Join our vibrant community where knowledge sharing meets meaningful connections. Teach what you know, learn what you love - all through time-based exchanges.</p>
+        {% if not current_user.is_authenticated %}
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 gap-3">Join Community</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Sign In</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Featured Skills Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <h2 class="text-center mb-4">Featured Skills</h2>
+        <div class="row g-4">
+            {% for skill in featured_skills %}
+            <div class="col-md-4">
+                <div class="card h-100 skill-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ skill.name }}</h5>
+                        <p class="card-text">{{ skill.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">{{ skill.category }}</span>
+                            <a href="{{ url_for('search') }}?q={{ skill.name }}" class="btn btn-outline-primary btn-sm">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">How It Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-person-plus display-4"></i>
+                    </div>
+                    <h3>Create Profile</h3>
+                    <p>List skills you can teach and what you want to learn</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-people display-4"></i>
+                    </div>
+                    <h3>Match & Connect</h3>
+                    <p>Find community members with complementary skills</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-arrow-repeat display-4"></i>
+                    </div>
+                    <h3>Exchange & Learn</h3>
+                    <p>Share knowledge and earn time credits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Community Stats Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <h2 class="text-center mb-4">Our Growing Community</h2>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h3 class="display-4 fw-bold text-primary">{{ '{:,}'.format(featured_skills|length) }}</h3>
+                <p class="lead">Available Skills</p>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h3 class="display-4 fw-bold text-primary">1,000+</h3>
+                <p class="lead">Active Members</p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="display-4 fw-bold text-primary">24/7</h3>
+                <p class="lead">Global Learning</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}'s Profile - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ user.username }}</h2>
+                    <p class="card-text">
+                        <strong>Member since:</strong> {{ user.created_at.strftime('%B %Y') }}<br>
+                        <strong>Time Credits:</strong> {{ user.time_credits }}
+                    </p>
+                    {% if user.bio %}
+                    <p class="card-text">{{ user.bio }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3>Skills Teaching</h3>
+                    <div class="mb-4">
+                        {% for skill in user.skills_teaching %}
+                        <span class="skill-badge">{{ skill.skill.name }}</span>
+                        {% else %}
+                        <p>No teaching skills listed yet.</p>
+                        {% endfor %}
+                    </div>
+
+                    <h3>Skills Learning</h3>
+                    <div>
+                        {% for skill in user.skills_learning %}
+                        <span class="skill-badge">{{ skill.skill.name }}</span>
+                        {% else %}
+                        <p>No learning skills listed yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
