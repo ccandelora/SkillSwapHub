@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Your Matches - Skill Swap{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Your Skill Matches</h2>
+    
+    {% if matches %}
+    <div class="row g-4">
+        {% for match in matches %}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="card-title">{{ match.user.username }}</h3>
+                        <span class="badge bg-primary">Match Score: {{ "%.0f"|format(match.score) }}%</span>
+                    </div>
+                    
+                    {% if match.compatibility.as_teacher.suggested_matches %}
+                    <div class="mb-3">
+                        <h4>You can teach:</h4>
+                        <ul class="list-unstyled">
+                            {% for pair in match.compatibility.as_teacher.suggested_matches %}
+                            <li><span class="badge bg-success">{{ pair }}</span></li>
+                            {% endfor %}
+                        </ul>
+                        <p class="text-muted small">{{ match.compatibility.as_teacher.reasoning }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if match.compatibility.as_learner.suggested_matches %}
+                    <div class="mb-3">
+                        <h4>You can learn:</h4>
+                        <ul class="list-unstyled">
+                            {% for pair in match.compatibility.as_learner.suggested_matches %}
+                            <li><span class="badge bg-info">{{ pair }}</span></li>
+                            {% endfor %}
+                        </ul>
+                        <p class="text-muted small">{{ match.compatibility.as_learner.reasoning }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('profile', username=match.user.username) }}" 
+                           class="btn btn-outline-primary">View Profile</a>
+                        <a href="{{ url_for('chat', user_id=match.user.id) }}" 
+                           class="btn btn-primary">Start Chat</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No matches found yet. Try adding more skills to your profile!
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

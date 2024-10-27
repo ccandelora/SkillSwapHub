@@ -16,9 +16,35 @@
                     {% if user.bio %}
                     <p class="card-text">{{ user.bio }}</p>
                     {% endif %}
+                    
+                    {% if user == current_user %}
+                    <a href="#" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                    {% else %}
+                    <a href="{{ url_for('chat', user_id=user.id) }}" 
+                       class="btn btn-primary btn-sm">Send Message</a>
+                    {% endif %}
                 </div>
             </div>
+            
+            {% if user == current_user and recommendations %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5">Recommended Skills</h3>
+                    <div class="list-group list-group-flush">
+                        {% for skill in recommendations.recommended_skills %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ skill }}</h6>
+                            <p class="mb-1 small text-muted">
+                                {{ recommendations.reasoning[loop.index0] }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
+        
         <div class="col-md-8">
             <div class="card mb-4">
                 <div class="card-body">
