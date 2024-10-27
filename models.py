@@ -37,6 +37,19 @@ class Message(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     read = db.Column(db.Boolean, default=False)
+    is_video_call = db.Column(db.Boolean, default=False)
+    video_room_id = db.Column(db.String(64), nullable=True)
+
+class VideoSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.String(64), unique=True, nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    learner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    skill_id = db.Column(db.Integer, db.ForeignKey('skill.id'), nullable=False)
+    start_time = db.Column(db.DateTime, default=datetime.utcnow)
+    end_time = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(20), default='pending')  # pending, active, completed
+    duration_minutes = db.Column(db.Integer, nullable=True)
 
 class TimeTransaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
