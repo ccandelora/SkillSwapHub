@@ -10,16 +10,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'main.login'
 
 @login_manager.user_loader
 def load_user(id):
     from models import User
     return User.query.get(int(id))
 
-# Register blueprints
-from routes.subscription import bp as subscription_bp
-app.register_blueprint(subscription_bp, url_prefix='/subscription')
+with app.app_context():
+    # Import routes after app initialization to avoid circular imports
+    from routes import routes_bp
+    app.register_blueprint(routes_bp)
 
-# Import routes after app initialization to avoid circular imports
-from routes import *
+    # Register subscription blueprint
+    from routes.subscription import bp as subscription_bp
+    app.register_blueprint(subscription_bp, url_prefix='/subscription')

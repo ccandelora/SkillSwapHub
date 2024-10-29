@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import func
 from app import db
@@ -65,7 +65,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and check_password_hash(user.password_hash, form.password.data):
+        if user and check_password_hash(user.password_hash, form.password.data or ''):
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.index'))
@@ -90,7 +90,7 @@ def register():
         user = User()
         user.username = form.username.data
         user.email = form.email.data
-        user.password_hash = generate_password_hash(form.password.data)
+        user.password_hash = generate_password_hash(form.password.data or '')
         
         db.session.add(user)
         db.session.commit()
@@ -122,10 +122,11 @@ def add_skill():
         user_skill.skill = skill
         user_skill.proficiency_level = form.proficiency_level.data
         user_skill.is_teaching = form.is_teaching.data
+        
         if form.is_teaching.data:
-            user_skill.teacher = current_user
+            user_skill.teacher_id = current_user.id
         else:
-            user_skill.learner = current_user
+            user_skill.learner_id = current_user.id
         
         db.session.add(user_skill)
         db.session.commit()

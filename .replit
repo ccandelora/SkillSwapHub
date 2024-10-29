@@ -13,7 +13,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Skill Swap Server"
+args = "Skill Swap Now Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
@@ -27,8 +27,16 @@ args = "Column Verification"
 task = "workflow.run"
 args = "Subscription Migration"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "User Location Migration"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Skill Tracking Migration"
+
 [[workflows.workflow]]
-name = "Skill Swap Server"
+name = "Skill Swap Now Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -71,6 +79,28 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python migrations/add_subscription_columns.py"
+
+[[workflows.workflow]]
+name = "User Location Migration"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python migrations/add_user_location.py"
+
+[[workflows.workflow]]
+name = "Skill Tracking Migration"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python migrations/add_skill_tracking_columns.py"
 
 [deployment]
 run = ["sh", "-c", "python main.py"]

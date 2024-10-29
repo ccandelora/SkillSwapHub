@@ -716,6 +716,7 @@ dependencies = [
     { name = "simple-websocket" },
     { name = "sqlalchemy" },
     { name = "stripe" },
+    { name = "werkzeug" },
 ]
 
 [package.metadata]
@@ -731,6 +732,7 @@ requires-dist = [
     { name = "simple-websocket", specifier = ">=1.1.0" },
     { name = "sqlalchemy" },
     { name = "stripe", specifier = ">=11.1.1" },
+    { name = "werkzeug", specifier = ">=3.0.6" },
 ]
 
 [[package]]
